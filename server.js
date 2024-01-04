@@ -5,8 +5,7 @@
 
 const path = require("path");
 
-const accountSid = 'AC1525ab11cd0bee6ddf00adcfd47731a9';
-const authToken = '7dfdd020ef42ca8dedd5415024a1fdb9';
+
 const client = require('twilio')(accountSid, authToken);
 
 // Require the fastify framework and instantiate it
