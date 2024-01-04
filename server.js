@@ -4,8 +4,10 @@
  */
 
 const path = require("path");
-
-
+const dotenv = require('dotenv');
+dotenv.config();
+const accountSid = process.env.TWILIO_ACCOUNT_SID;//'AC1525ab11cd0bee6ddf00adcfd47731a9';
+const authToken = process.env.TWILIO_AUTH_TOKEN;//'7dfdd020ef42ca8dedd5415024a1fdb9';
 const client = require('twilio')(accountSid, authToken);
 
 // Require the fastify framework and instantiate it
@@ -48,19 +50,24 @@ if (seo.url === "glitch-default") {
  * Accepts body data indicating the user choice
  */
 fastify.post("/sendSMS", async function (request, reply) {
-  console.log(request.body?.sendNumber)
-  try {
-    const message = await client.messages
-      .create({
-        body: 'Dipprokash sardar',
-        messagingServiceSid: 'MG392d12187791dc418b0d24d4e9e7771c',
-        to: request.body?.sendNumber||'+916289766571'
-      });
 
-    return message;
+  try {
+    if (request.body?.send_number) {
+      const message = await client.messages
+        .create({
+          body: request.body?.message_body||'',
+          messagingServiceSid: 'MG392d12187791dc418b0d24d4e9e7771c',
+          to: request.body?.send_number
+        });
+
+
+      reply.status(200).send({ message: message });
+    } else {
+      reply.status(400).send({ message: "Please provide a mobile number" });
+    }
   } catch (error) {
     console.error(error);
-    reply.status(500).send({ message: error.message });
+    reply.status(500).send({ message: error });
   }
 
 }
@@ -70,6 +77,7 @@ fastify.post("/sendSMS", async function (request, reply) {
 );
 
 // Run the server and report out to the logs
+
 fastify.listen(
   { port: process.env.PORT, host: "0.0.0.0" }, //process.env.PORT
   function (err, address) {
